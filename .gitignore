@@ -53,3 +53,6 @@ backup_*/
 
 # Main backend launcher MUST stay
 !/run_instructor_console.sh
+
+# Development-only launchers
+run_dev*.sh
