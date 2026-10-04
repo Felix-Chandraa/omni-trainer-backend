@@ -1,0 +1,55 @@
+# Python generated
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Runtime / generated
+logs/
+log/
+tmp/
+temp/
+.cache/
+runtime/
+.runtime/
+*.log
+*.tlog
+*.tlog.raw
+*.pid
+
+# Local databases / runtime evidence
+*.sqlite
+*.sqlite3
+*.db
+
+# Backup
+*.bak
+*.backup
+backup_*/
+*BACKUP*/
+
+# Development-only shell helpers
+**/dev_*.sh
+**/debug_*.sh
+**/test_*.sh
+**/verify_*.sh
+**/audit_*.sh
+**/patch_*.sh
+**/repair_*.sh
+**/fix_*.sh
+**/tmp_*.sh
+**/backup_*.sh
+
+# Main backend launcher MUST stay
+!/run_instructor_console.sh

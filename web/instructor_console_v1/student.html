@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OMNI Trainer — Student Station</title>
+<style>
+:root{--bg:#0b1118;--panel:#121b25;--panel2:#17222e;--line:#263443;--text:#e8eef5;--muted:#90a0b2;--accent:#48b7ff;--ok:#4dd58a;--warn:#f1b84b;--bad:#f06767}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;min-height:100vh;padding:14px}
+.shell{display:grid;grid-template-columns:320px 1fr;gap:14px;min-height:calc(100vh - 28px)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.side{overflow:auto}.flight{padding:0;overflow:hidden;min-height:720px;position:relative}.flight iframe{width:100%;height:100%;min-height:720px;border:0;background:#071019}.flightFocusExit{display:none;position:absolute;z-index:30;left:10px;bottom:10px;right:auto;top:auto;background:rgba(13,21,30,.82);color:#e8eef5;border:1px solid #48647c;box-shadow:0 3px 12px rgba(0,0,0,.28);padding:5px 8px;font-size:10px;line-height:1.1;border-radius:6px;opacity:.82}
+.flightFocusExit:hover{opacity:1}/* DEV018_REV7_1_EXIT_BUTTON_BOTTOM_LEFT */body.flightFocus{padding:0;overflow:hidden}body.flightFocus .shell{display:block;min-height:100vh}body.flightFocus .side{display:none}body.flightFocus .flight{position:fixed;inset:0;z-index:20;border-radius:0;border:0;min-height:100vh}body.flightFocus .flight iframe{min-height:100vh;height:100vh}body.flightFocus .flightFocusExit{display:block}
+.small{font-size:12px;color:var(--muted)}h1{font-size:20px;margin:3px 0 6px}h2{font-size:14px;margin:18px 0 7px}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+button{font:inherit;border:0;border-radius:8px;padding:11px 14px;font-weight:800;cursor:pointer}
+button:disabled{opacity:.35;cursor:not-allowed}.primary{background:var(--accent);color:#04121e}.secondary{background:#1d2a38;color:var(--text);border:1px solid var(--line)}
+.notice{margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:8px;color:var(--muted);background:var(--panel2)}
+.badbox{border-color:#70343a;color:#ffd9dc;background:#32181b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.badge{display:inline-flex;padding:5px 8px;border-radius:999px;background:#1d2a38;font-size:12px}.hidden{display:none!important}
+.statebox{margin-top:12px;padding:11px;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+.statebox strong{display:block;margin-bottom:3px}
+@media(max-width:950px){.shell{grid-template-columns:1fr}.flight{min-height:600px}.flight iframe{min-height:600px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="card side">
+    <div class="small">OMNI TRAINER · STUDENT STATION · DEV-018 REV7</div>
+    <h1>Training Station</h1>
+    <div id="statusBadge" class="badge warn">CONNECTING…</div>
+
+    <div id="content" class="hidden">
+      <h2>Assignment</h2>
+      <div class="row"><span>Student</span><strong id="student">—</strong></div>
+      <div class="row"><span>Exercise</span><strong id="scenario">—</strong></div>
+      <div class="row"><span>Attempt</span><strong id="attempt">—</strong></div>
+      <div class="row"><span>Attempt state</span><strong id="attemptState">—</strong></div>
+
+      <h2>Flight station</h2>
+      <div class="row"><span>Feather client</span><strong id="clientState" class="warn">WAITING</strong></div>
+      <div class="row"><span>MAVLink control</span><strong id="mavState" class="warn">WAITING</strong></div>
+      <div class="row"><span>Flight authority</span><strong id="authorityState" class="warn">WAITING</strong></div><div class="actions" style="margin-top:12px"><button id="expandFlightBtn" class="secondary" onclick="toggleFlightFocus()">EXPAND FLIGHT VIEW</button></div><!-- DEV018_REV7_STUDENT_FOCUS_VIEW -->
+
+      <div class="statebox">
+        <strong id="lifecycleTitle">Preparing station…</strong>
+        <span id="lifecycleText" class="small"></span>
+      </div>
+
+      <div id="readyNotice" class="notice">
+        READY becomes available only after Feather is connected to this Attempt and the MAVLink control adapter is fresh.
+      </div>
+
+      <div id="readyActions" class="actions">
+        <button id="readyBtn" class="primary" onclick="setReady(true)">I'M READY</button>
+        <button id="notReadyBtn" class="secondary" onclick="setReady(false)">NOT READY</button>
+      </div>
+    </div>
+
+    <div id="error" class="notice badbox hidden"></div>
+  </aside>
+
+  <main class="card flight" id="flightPane"><button id="flightFocusExit" class="flightFocusExit" onclick="toggleFlightFocus()" aria-label="Exit expanded flight view">MINIMIZE VIEW</button>
+    <div id="flightPlaceholder" style="padding:24px">
+      <h1>Flight display waiting</h1>
+      <div class="small">
+        Keep this page open. After the instructor runs trusted readiness, the same page will load Feather/Cesium and attach it to this Attempt.
+      </div>
+    </div>
+    <iframe id="featherFrame" class="hidden" allow="fullscreen"></iframe>
+  </main>
+</div>
+
+<script>
+const p=new URLSearchParams(location.search);
+const attempt=p.get('attempt')||'';
+const token=p.get('token')||'';
+const stationKey='omni_student_station_id';
+let stationId=localStorage.getItem(stationKey);
+if(!stationId){
+  stationId='student-'+Math.random().toString(36).slice(2,10);
+  localStorage.setItem(stationKey,stationId);
+}
+let ready=false,alive=true,attemptState='',control={};
+let featherSignature='';
+
+function el(id){return document.getElementById(id)}
+function setBadge(text,cls){const e=el('statusBadge');e.textContent=text;e.className='badge '+cls}
+function setLifecycle(title,text,cls=''){el('lifecycleTitle').textContent=title;el('lifecycleTitle').className=cls;el('lifecycleText').textContent=text}
+function showFatal(text){el('error').textContent=text;el('error').classList.remove('hidden');el('readyActions').classList.add('hidden');setBadge('DISCONNECTED','bad')}
+function endedUI(){alive=false;attemptState='ENDED';el('attemptState').textContent='ENDED';el('readyActions').classList.add('hidden');el('readyNotice').classList.add('hidden');el('error').classList.add('hidden');setBadge('ATTEMPT ENDED','bad');setLifecycle('Training attempt ended','This Attempt/token is closed. A new Attempt will use a new Student Join Link.','bad')}
+async function requestJson(path,options={}){const r=await fetch(path,{cache:'no-store',...options});let j={};try{j=await r.json()}catch(e){}if(!r.ok||j.ok===false){const err=new Error(j.error||('HTTP '+r.status));err.code=j.error||'request_failed';throw err}return j}
+async function post(path,body){return requestJson(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}
+
+// DEV018_REV7_STUDENT_FOCUS_VIEW
+function syncFlightFocusButtons(){
+  const focused=document.body.classList.contains('flightFocus');
+  const b=el('expandFlightBtn');
+  if(b)b.textContent=focused?'EXIT EXPANDED VIEW':'EXPAND FLIGHT VIEW';
+}
+async function toggleFlightFocus(){
+  const entering=!document.body.classList.contains('flightFocus');
+  if(entering){
+    document.body.classList.add('flightFocus');syncFlightFocusButtons();
+    try{if(document.documentElement.requestFullscreen&&!document.fullscreenElement)await document.documentElement.requestFullscreen()}catch(e){}
+  }else{
+    document.body.classList.remove('flightFocus');syncFlightFocusButtons();
+    try{if(document.fullscreenElement&&document.exitFullscreen)await document.exitFullscreen()}catch(e){}
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  if(!document.fullscreenElement&&document.body.classList.contains('flightFocus')){document.body.classList.remove('flightFocus');syncFlightFocusButtons()}
+});
+
+function controlReady(){
+  return !!(control.available&&control.gateway_started&&control.client_connected&&control.mav_peer_ready&&control.authority)
+}
+function ensureFeather(){
+  if(!control.available||!control.token||!control.feather_http_port||!control.feather_map_filename)return;
+  const protocol=location.protocol==='https:'?'wss':'ws';
+  const wsServer=protocol+'://'+location.hostname+':'+control.control_port;
+  const params=new URLSearchParams({
+    omni_remote:'1',
+    server:wsServer,
+    student_id:control.student_id,
+    token:control.token
+  });
+  const signature=[control.feather_http_port,control.feather_map_filename,wsServer,control.token].join('|');
+  if(signature===featherSignature)return;
+  featherSignature=signature;
+  const src='http://'+location.hostname+':'+control.feather_http_port+'/'+control.feather_map_filename+'#'+params.toString();
+  el('featherFrame').src=src;
+  el('featherFrame').classList.remove('hidden');
+  el('flightPlaceholder').classList.add('hidden');
+}
+function renderControl(){
+  const cr=controlReady();
+  el('clientState').textContent=control.client_connected?'CONNECTED':'WAITING';
+  el('clientState').className=control.client_connected?'ok':'warn';
+  el('mavState').textContent=control.mav_peer_ready?'READY':'WAITING';
+  el('mavState').className=control.mav_peer_ready?'ok':'warn';
+  el('authorityState').textContent=control.authority?'STUDENT · EPOCH '+control.authority.epoch:'WAITING';
+  el('authorityState').className=control.authority?'ok':'warn';
+  ensureFeather();
+  return cr;
+}
+function render(){
+  const state=String(attemptState||'').toLowerCase();
+  el('attemptState').textContent=(attemptState||'UNKNOWN').toUpperCase();
+  const ctlReady=renderControl();
+  const preStart=(state==='setup'||state==='ready');
+  el('readyActions').classList.toggle('hidden',!preStart);
+  el('readyNotice').classList.toggle('hidden',!preStart);
+  el('readyBtn').disabled=ready||!preStart||!ctlReady;
+  el('notReadyBtn').disabled=!ready||!preStart;
+
+  if(state==='setup'){
+    setBadge('CONNECTED · SYSTEM PREPARING','warn');
+    setLifecycle('Waiting for trusted readiness',control.available?'Feather control bridge is preparing.':'Instructor must run trusted readiness before Feather/control can attach.','warn');
+  }else if(state==='ready'){
+    if(!ctlReady){
+      setBadge('READY · CONNECTING FLIGHT STATION','warn');
+      setLifecycle('Connecting Feather/control','Do not declare READY until Feather client, MAVLink control, and Flight authority are all green.','warn');
+    }else if(!ready){
+      setBadge('FLIGHT STATION READY','ok');
+      setLifecycle('Student readiness required','Feather/control is attached to this Attempt. Verify your station, then press I\'M READY.','ok');
+    }else{
+      setBadge('READY · WAITING FOR START','ok');
+      setLifecycle('Waiting for instructor Start','Keep this page open. The same Feather/control connection remains attached after Start.','ok');
+    }
+  }else if(state==='active'){
+    setBadge(control.client_connected?'SESSION ACTIVE':'ACTIVE · FLIGHT CLIENT LOST',control.client_connected?'ok':'bad');
+    setLifecycle('Training session active',control.client_connected?'Feather/control is operating on this authoritative Attempt.':'Flight client disconnected; existing deadman/router releases control, but rev6 does not yet auto-Interrupt the Attempt.',control.client_connected?'ok':'bad');
+  }else if(state==='paused'){
+    setBadge('SESSION PAUSED','warn');setLifecycle('Training session paused','Remain connected.','warn');
+  }else if(state==='interrupted'){
+    setBadge('SESSION INTERRUPTED','bad');setLifecycle('Training session interrupted','Commands may be blocked while continuity is evaluated.','bad');
+  }else if(state==='ended'){endedUI()}
+}
+function consume(j){if(j.attempt_state)attemptState=j.attempt_state;if(typeof j.ready==='boolean')ready=j.ready;control=j.control||{};render()}
+async function load(){if(!attempt||!token){showFatal('Invalid join link.');return}try{const j=await requestJson('/api/student/context?attempt='+encodeURIComponent(attempt)+'&token='+encodeURIComponent(token));el('student').textContent=(j.student_name||j.student_id)+' / '+j.student_id;el('scenario').textContent=j.scenario;el('attempt').textContent=j.attempt_id.slice(0,8);el('content').classList.remove('hidden');consume(j);await heartbeat()}catch(e){if(e.code==='student_attempt_ended'){el('content').classList.remove('hidden');endedUI();return}showFatal(e.message)}}
+async function heartbeat(){if(!alive)return;try{const j=await post('/api/student/heartbeat',{attempt_id:attempt,token,station_id:stationId,ready});el('error').classList.add('hidden');consume(j)}catch(e){if(e.code==='student_attempt_ended'){endedUI();return}showFatal(e.message)}}
+async function setReady(v){if(!['setup','ready'].includes(String(attemptState).toLowerCase()))return;if(v&&!controlReady())return;ready=!!v;await heartbeat()}
+window.addEventListener('beforeunload',()=>{alive=false});
+setInterval(heartbeat,1000);
+load();
+</script>
+</body>
+</html>
+

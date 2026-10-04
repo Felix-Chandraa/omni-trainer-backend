@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OMNI Trainer — Instructor Console</title>
+<style>
+:root{--bg:#0b1118;--panel:#121b25;--panel2:#17222e;--line:#263443;--text:#e8eef5;--muted:#90a0b2;--accent:#48b7ff;--ok:#4dd58a;--warn:#f1b84b;--bad:#f06767;--soft:#1d2a38}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif}button,input,select{font:inherit}.app{display:grid;grid-template-rows:58px 1fr 44px;min-height:100vh}.top{display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line);background:#0d151e}.brand{font-weight:800;letter-spacing:.08em}.small{font-size:12px;color:var(--muted)}.main{display:grid;grid-template-columns:190px 1fr}.side{border-right:1px solid var(--line);padding:16px;background:#0e1620}.nav{display:block;width:100%;text-align:left;padding:11px 12px;margin:4px 0;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}.nav.active,.nav:hover{background:var(--soft);color:var(--text)}.work{padding:26px;overflow:auto}.strip{border-top:1px solid var(--line);display:flex;gap:24px;align-items:center;padding:0 20px;background:#0d151e;color:var(--muted)}.strip strong{color:var(--text)}h1{font-size:24px;margin:0 0 6px}h2{font-size:16px;margin:24px 0 12px}.lead{color:var(--muted);margin-bottom:20px}.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}.row{display:flex;gap:14px;flex-wrap:wrap}.metric{background:var(--panel2);border-radius:8px;padding:12px;min-width:150px}.metric b{display:block;font-size:18px}.primary,.secondary,.danger,.ghost{border:1px solid transparent;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}.primary{background:var(--accent);color:#04121e}.secondary{background:var(--soft);color:var(--text);border-color:var(--line)}.danger{background:#5a2228;color:#ffdfe2;border-color:#7d3038}.ghost{background:transparent;color:var(--muted);border-color:var(--line)}button:disabled{opacity:.35;cursor:not-allowed}.big{padding:13px 20px}.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:var(--soft);font-size:12px}.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}.accent{color:var(--accent)}.wizard{display:flex;margin:18px 0 26px}.step{flex:1;padding:10px;border-bottom:2px solid var(--line);color:var(--muted)}.step.active{border-color:var(--accent);color:var(--text)}.step.done{border-color:var(--ok);color:var(--ok)}label{display:block;color:var(--muted);font-size:12px;margin:13px 0 5px}input,select{width:100%;max-width:360px;padding:10px;background:#0d151e;border:1px solid var(--line);border-radius:7px;color:var(--text)}.choice{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:10px 0;padding:15px;background:var(--panel);border:1px solid var(--line);border-radius:10px}.choice.selected{border-color:var(--accent)}.actions{display:flex;justify-content:space-between;margin-top:24px}.check{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.hidden{display:none!important}.livegrid{display:grid;grid-template-columns:minmax(480px,1.7fr) minmax(300px,.8fr);gap:14px}.actionbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.notice{padding:12px;border:1px solid #604d28;background:#2a2418;color:#f2cf79;border-radius:8px;margin:12px 0}.error{padding:12px;border:1px solid #6b2c33;background:#2d171a;color:#ffb9c0;border-radius:8px;margin:12px 0}.spinner{display:inline-block;width:12px;height:12px;border:2px solid #47708f;border-top-color:#bfe8ff;border-radius:50%;animation:spin .8s linear infinite;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}.table{width:100%;border-collapse:collapse}.table td,.table th{padding:10px;border-bottom:1px solid var(--line);text-align:left}.table th{color:var(--muted)}@media(max-width:850px){.main{grid-template-columns:1fr}.side{display:none}.livegrid{grid-template-columns:1fr}}
+.app.summaryMode{grid-template-rows:58px 1fr}.app.summaryMode #runtimeStrip{display:none}.endedClean{max-width:760px}.endedClean .actionbar{margin-top:18px}
+/* DEV019_REVIEW_UI */
+.reviewShell{display:grid;gap:14px}.reviewTop{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}.reviewBadges{display:flex;gap:8px;flex-wrap:wrap}.reviewGrid{display:grid;grid-template-columns:minmax(520px,1.55fr) minmax(300px,.8fr);gap:14px}.reviewViewerCard{padding:0;overflow:hidden}.reviewViewerCard:fullscreen{width:100vw;height:100vh;max-width:none;margin:0;border:0;border-radius:0;display:flex;flex-direction:column;background:#071019}.reviewViewerCard:fullscreen .reviewViewer{height:auto;min-height:0;flex:1}.reviewViewerCard:fullscreen .reviewHud{flex:0 0 auto}.reviewViewerCard:fullscreen .reviewTimeline{flex:0 0 auto;background:#0b141d}.reviewViewerCard:-webkit-full-screen{width:100vw;height:100vh;max-width:none;margin:0;border:0;border-radius:0;display:flex;flex-direction:column;background:#071019}.reviewViewerCard:-webkit-full-screen .reviewViewer{height:auto;min-height:0;flex:1}.reviewViewer{height:460px;background:#071019;position:relative}.reviewViewerFallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted);background:linear-gradient(135deg,#08131d,#101b27);z-index:1}.reviewViewerFallback.hidden{display:none!important}.reviewHud{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;border-top:1px solid var(--line)}.reviewHud .metric{min-width:0}.reviewSide{display:grid;gap:14px;align-content:start}.reviewTimeline{padding:14px}.reviewTimeline input[type=range]{width:100%;max-width:none}.reviewTimelineMeta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:5px}.reviewControls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.reviewControls select{width:auto;min-width:92px}.reviewEvidence{display:grid;grid-template-columns:1fr 1fr;gap:8px}.reviewEvidence .metric{min-width:0}.reviewActuator{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.reviewActuator .metric{min-width:0;padding:9px}.reviewActuator .metric b{font-size:15px}.reviewPlane{height:150px;position:relative;margin-top:10px;border:1px solid var(--line);border-radius:10px;background:#0b151f;overflow:hidden}.reviewPlaneBody{position:absolute;left:50%;top:18%;width:8px;height:96px;transform:translateX(-50%);background:#65778a;border-radius:50% 50% 20% 20%}.reviewWing{position:absolute;left:50%;top:48%;width:200px;height:8px;transform:translateX(-50%);background:#65778a;border-radius:8px}.reviewTail{position:absolute;left:50%;top:73%;width:90px;height:6px;transform:translateX(-50%);background:#65778a}.reviewSurface{position:absolute;background:var(--accent);transform-origin:center;transition:transform .08s linear}.reviewAilL{width:60px;height:7px;left:calc(50% - 99px);top:52%}.reviewAilR{width:60px;height:7px;right:calc(50% - 99px);top:52%}.reviewTailL{width:36px;height:6px;left:calc(50% - 44px);top:77%;transform-origin:right center}.reviewTailR{width:36px;height:6px;right:calc(50% - 44px);top:77%;transform-origin:left center}.reviewProp{position:absolute;left:50%;top:9%;width:54px;height:4px;background:var(--ok);transform:translateX(-50%);transform-origin:center}.reviewReadOnly{border-color:#345c77;background:#102131;color:#a9ddff}.reviewGap{border-color:#735c2d;background:#2b2416;color:#ffd88a}.reviewLiveContext{padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#0f1923;color:var(--muted)}.reviewLiveContext strong{color:var(--text)}
+@media(max-width:1000px){.reviewGrid{grid-template-columns:1fr}.reviewViewer{height:380px}}@media(max-width:650px){.reviewHud{grid-template-columns:1fr 1fr}.reviewActuator{grid-template-columns:1fr 1fr}.reviewEvidence{grid-template-columns:1fr}}
+</style>
+
+<!-- DEV019_REVIEW_CESIUM -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cesium/1.118.1/Cesium.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cesium/1.118.1/Widgets/widgets.css">
+</head>
+<body>
+<div class="app" id="appRoot">
+<header class="top"><div><div class="brand">OMNI TRAINER — INSTRUCTOR CONSOLE</div><div class="small">DEV-019 · Stored-State Review</div></div><div><strong>Instructor</strong><div class="small" id="clock"></div></div></header>
+<div class="main"><aside class="side"><button class="nav active" onclick="show('dashboard')">Dashboard</button><button class="nav" disabled>Sessions</button><button class="nav" disabled>Students</button><button class="nav" disabled>Scenarios</button><button class="nav" id="reviewNavBtn" onclick="openReviewBrowser()">Review</button><button class="nav" disabled>System</button></aside>
+<main class="work">
+<div id="msg"></div>
+<section id="dashboard"><h1>Dashboard</h1><div class="lead">Real core integration for initial 1 instructor + 1 student engineering flow.</div><div class="card"><span class="badge accent">DEV-018 R4-A</span><h2 style="font-size:20px">Create a real Session / Exercise / Attempt.</h2><p class="lead">This revision uses the existing training core, direct worker, trusted readiness and authorized Active gate.</p><button class="primary big" onclick="beginWizard()">+ NEW SESSION</button></div><h2>Current core status</h2><div class="row"><div class="metric"><span class="small">Attempt</span><b id="dashAttempt">None</b></div><div class="metric"><span class="small">State</span><b id="dashState">—</b></div><div class="metric"><span class="small">Worker</span><b id="dashWorker">—</b></div></div><!-- DEV018_REV3_SESSION_RECOVERY -->
+<div id="currentSessionCard" class="card hidden" style="margin-top:16px;border-color:#2f678a">
+  <div class="row" style="justify-content:space-between;align-items:center">
+    <div>
+      <span class="small">CURRENT SESSION</span>
+      <h2 id="currentSessionTitle" style="font-size:19px;margin:5px 0 3px">—</h2>
+      <div class="small">
+        <span id="currentSessionAttempt">—</span>
+        · <span id="currentSessionState">—</span>
+        · <span id="currentSessionWorker">—</span>
+      </div>
+    </div>
+    <button id="openCurrentSessionBtn" class="primary big" onclick="openCurrentSession(false)">OPEN SESSION</button>
+  </div>
+</div>
+<div id="limitations"></div></section>
+<section id="wizard" class="hidden"><h1>New Training Session</h1><div class="wizard"><div class="step active" id="s1">1 Student</div><div class="step" id="s2">2 Exercise</div><div class="step" id="s3">3 Configuration</div><div class="step" id="s4">4 Readiness</div></div>
+<div id="w1"><h2>Student</h2><div class="row"><div><label>Student ID</label><input id="studentId" value="STU-001"></div><div><label>Student name</label><input id="studentName" value="Student 01"></div></div><div class="notice">Supervised StudentProfile registry is not implemented in DEV-018 rev2. The entered Student ID is persisted into the real core Session.</div><div class="actions"><button class="ghost" onclick="show('dashboard')">Cancel</button><button class="primary" onclick="step(2)">Continue →</button></div></div>
+<div id="w2" class="hidden"><div class="row"><div><label>Level</label><select id="level"><option>Basic</option><option>Advanced</option></select></div><div><label>Training mode</label><select id="mode"><option>Practice</option><option disabled>Assessment — not released</option></select></div><div><label>Role</label><select id="role"><option>Solo</option></select></div></div><h2>Exercise</h2><div class="choice selected"><div><strong>Manual Landing</strong><div class="small">MAN-LDG-004-v1.0 · engineering scenario metadata</div></div><span class="badge accent">SELECTED</span></div><div class="actions"><button class="ghost" onclick="step(1)">← Back</button><button class="primary" onclick="step(3)">Continue →</button></div></div>
+<div id="w3" class="hidden"><h2>Configuration</h2><div class="card"><div class="row"><div><label>Aircraft</label><input value="omni-1" id="aircraft"></div><div><label>Environment</label><input value="Wiriadinata / ENV-WIR-03" id="environment"></div><div><label>Runway</label><select id="runway"><option>15 / 33</option></select></div></div><div class="row"><div><label>Wind speed (kt)</label><input id="windSpeed" type="number" value="4"></div><div><label>Wind direction (deg)</label><input id="windDir" type="number" value="150"></div></div></div><div class="notice">Configuration is saved as a DEV-018 sidecar snapshot. It is not yet the full production ConfigurationSnapshot service.</div><div class="actions"><button class="ghost" onclick="step(2)">← Back</button><button class="primary" id="createBtn" onclick="createSession()">Create Session & Attempt →</button></div></div>
+<div id="w4" class="hidden"><h2>Readiness</h2><div class="row"><span class="badge" id="attemptBadge">ATT —</span><span class="badge">State: <strong id="readyState" style="margin-left:5px">SETUP</strong></span></div><div class="card" style="margin-top:14px"><div class="check"><span>Session / Exercise / Attempt persisted in core</span><strong id="coreCreated" class="ok">✓ PASS</strong></div><div class="check"><span>Direct worker + fresh FG/MAV trusted evidence</span><strong id="runtimeReady" class="warn">○ NOT RUN</strong></div><div class="check"><span>Authoritative core Attempt state</span><strong id="coreStateCheck">SETUP</strong></div><!-- DEV018_REV4_STUDENT_HANDSHAKE_UI --><!-- DEV018_REV5_STUDENT_LIFECYCLE_UI -->
+<div class="check"><span>Student station handshake</span><strong id="studentReady" class="warn">○ NOT CONNECTED</strong></div><div class="check"><span>Feather / Flight control path</span><strong id="controlReady" class="warn">○ NOT PREPARED</strong></div><!-- DEV018_REV6_CONTROL_UI --></div>
+<div class="card" style="margin-top:14px;border-color:#2f678a">
+  <span class="small">STUDENT JOIN LINK</span>
+  <div id="studentJoinUrl" style="margin:7px 0;word-break:break-all">Create the Attempt first.</div>
+  <div class="small">Open this link on the assigned student station. The token is scoped to the current Attempt.</div>
+  <div style="margin-top:10px"><button class="secondary" id="copyJoinBtn" onclick="copyStudentLink()">COPY JOIN LINK</button></div>
+</div>
+<div style="margin-top:14px"><button class="secondary big" id="prepareBtn" onclick="prepareRuntime()">RUN TRUSTED READINESS</button></div><div class="actions"><button class="ghost" disabled>Configuration locked after Attempt creation</button><button class="primary big" id="startBtn" onclick="startSession()" disabled>START ENGINEERING SESSION</button></div></div></section>
+<section id="live" class="hidden"><!-- DEV018_REV8_2B_ENDED_UI_FIX -->
+<h1>Live Supervision</h1>
+<div class="row">
+  <span class="badge ok" id="liveState">● ACTIVE</span>
+  <span class="badge" id="liveAttempt"></span>
+  <span class="badge" id="liveStudent"></span>
+</div>
+<div id="interruptBanner" class="notice bad hidden"><strong id="interruptTitle">ATTEMPT INTERRUPTED</strong><div id="interruptText" class="small" style="margin-top:5px">Flight simulation is held. Waiting for Student/control continuity.</div></div><!-- DEV018_REV9R3_INTERRUPTED_RECOVERY_UI --><!-- DEV018_REV9R3A_RECOVERY_UI -->
+<div class="livegrid" style="margin-top:14px">
+  <div>
+    <!-- DEV018_REV8_1_INSTRUCTOR_STREAM_SLOT -->
+    <div class="card" id="studentStreamSlot" style="min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;background:#0b141d">
+      <div>
+        <span class="badge accent">STUDENT / CLIENT STREAM</span>
+        <h2 style="margin:12px 0 6px">Streaming source not connected</h2>
+        <div class="small">Reserved for the future Student/client video or screen stream.</div>
+      </div>
+    </div>
+    <h2>Authoritative flight state</h2>
+    <div class="row">
+      <div class="metric"><span class="small">Latitude</span><b id="lat">—</b></div>
+      <div class="metric"><span class="small">Longitude</span><b id="lon">—</b></div>
+      <div class="metric"><span class="small">Alt MSL</span><b id="alt">—</b></div>
+      <div class="metric"><span class="small">Yaw</span><b id="yaw">—</b></div>
+      <div class="metric"><span class="small">Roll</span><b id="roll">—</b></div>
+      <div class="metric"><span class="small">Pitch</span><b id="pitch">—</b></div>
+      <div class="metric"><span class="small">AGL</span><b id="agl">—</b></div>
+      <div class="metric"><span class="small">Ground speed</span><b id="gs">—</b></div>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <span class="small">STUDENT</span>
+      <h2 id="studentLabel" style="margin-top:4px"></h2>
+      <h2>Runtime</h2>
+      <div class="check"><span>Worker health</span><strong id="workerHealth">—</strong></div>
+      <div class="check"><span>Attempt state</span><strong id="attemptState">—</strong></div>
+      <h2>Authority / Control</h2>
+      <div class="check"><span>Student Flight authority</span><strong id="liveControl" class="warn">WAITING</strong></div>
+      <div class="notice">Student Flight control uses the existing DEV-015 validator/deadman/epoch path. Instructor takeover/handback remains disabled.</div>
+    </div>
+  </div>
+</div>
+<div class="actionbar" id="liveActions">
+  <button class="secondary big" id="pauseResumeBtn" onclick="pauseSession()">PAUSE</button>
+<div id="r4aAuthorityControls" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+  <span id="r4aAuthorityStatus" class="badge">FLIGHT OWNER —</span>
+  <button class="secondary big" id="r4aTakeoverBtn" onclick="r4aTakeover()">TAKE CONTROL</button>
+  <button class="secondary big" id="r4aHandbackBtn" onclick="r4aHandback()">HAND BACK TO STUDENT</button>
+  <button class="secondary big" id="r4aCancelHandbackBtn" onclick="r4aCancelHandback()">CANCEL HANDBACK</button>
+</div><!-- DEV018_R4A_AUTHORITY_UI --><!-- DEV018_REV9R2_AUTHORITATIVE_PAUSE_UI -->
+  <button class="secondary big" disabled>TAKE CONTROL — not wired</button>
+  <button class="danger big" onclick="endSession()">END ATTEMPT</button>
+</div>
+</section>
+<section id="complete" class="hidden endedClean"><h1>Session Complete</h1><div class="card"><span class="badge">ENDED</span><h2 id="doneTitle" style="font-size:21px"></h2><div class="row"><div class="metric"><span class="small">Attempt</span><b id="doneAttempt"></b></div><div class="metric"><span class="small">State</span><b>ENDED</b></div></div><div class="actionbar"><button class="primary big" id="openReviewBtn" onclick="openEndedReview()">OPEN REVIEW</button><button class="secondary" onclick="beginWizard()">NEW SESSION</button><button class="ghost" onclick="show('dashboard')">DASHBOARD</button></div></div></section>
+
+<section id="review" class="hidden reviewShell">
+  <div class="reviewTop">
+    <div><h1>Historical Review</h1><div class="lead">Replay authoritative stored evidence. Review never starts simulation, takes authority, or sends Flight/Payload commands.</div></div>
+    <div class="reviewBadges"><span class="badge reviewReadOnly">READ ONLY</span><span class="badge">STORED STATE</span><span class="badge ok">FDM OFF</span></div>
+  </div>
+  <div id="reviewLiveContext" class="reviewLiveContext"><strong>LIVE CONTEXT</strong> · No current live Attempt.</div>
+  <div class="card">
+    <div class="row" style="align-items:flex-end;justify-content:space-between">
+      <div style="flex:1;min-width:280px"><label>Ended Attempt</label><select id="reviewAttemptSelect" style="max-width:none"><option>Loading reviewable Attempts…</option></select></div>
+      <div class="actionbar" style="margin:0"><button class="secondary" id="reviewRefreshBtn" onclick="reviewLoadCatalog()">REFRESH LIST</button><button class="primary" id="reviewOpenSelectedBtn" onclick="reviewOpenSelected()">OPEN EVIDENCE</button></div>
+    </div>
+    <div class="small" id="reviewCatalogStatus">Only Ended Attempts exposed by the canonical Review catalog are selectable.</div>
+  </div>
+  <div id="reviewWorkspace" class="hidden">
+    <div class="reviewGrid">
+      <div class="card reviewViewerCard">
+        <div id="reviewCesium" class="reviewViewer"><div id="reviewCesiumFallback" class="reviewViewerFallback">Initializing read-only Cesium Review renderer…</div></div>
+        <div class="reviewHud">
+          <div class="metric"><span class="small">POSITION</span><b id="reviewPos">—</b></div>
+          <div class="metric"><span class="small">ALT MSL / AGL</span><b id="reviewAlt">—</b></div>
+          <div class="metric"><span class="small">HDG</span><b id="reviewHdg">—</b></div>
+          <div class="metric"><span class="small">ROLL</span><b id="reviewRoll">—</b></div>
+          <div class="metric"><span class="small">PITCH</span><b id="reviewPitch">—</b></div>
+          <div class="metric"><span class="small">FRAME</span><b id="reviewFrame">—</b></div>
+        </div>
+        <div class="reviewTimeline">
+          <input id="reviewTimeline" type="range" min="0" max="1" step="1" value="0" oninput="reviewPreviewTimeline(this.value)" onchange="reviewSeekTimeline(this.value)">
+          <div class="reviewTimelineMeta"><span id="reviewTimeNow">00:00.000</span><span id="reviewTimeEnd">00:00.000</span></div>
+          <div class="reviewControls">
+            <button class="primary" id="reviewPlayBtn" onclick="reviewTogglePlay()">PLAY</button>
+            <select id="reviewSpeed" onchange="reviewSetSpeed(this.value)"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+            <button class="secondary" onclick="reviewStep(-1)">◀ FRAME</button><button class="secondary" onclick="reviewStep(1)">FRAME ▶</button>
+            <button class="secondary" onclick="reviewEventJump(-1)">◀ EVENT</button><button class="secondary" onclick="reviewEventJump(1)">EVENT ▶</button>
+            <button class="ghost" onclick="reviewRecenter()">RECENTER</button><button class="secondary" id="reviewFullscreenBtn" onclick="reviewToggleFullscreen()">FULLSCREEN</button>
+          </div>
+        </div>
+      </div>
+      <div class="reviewSide">
+        <div class="card"><span class="badge reviewReadOnly">HISTORICAL EVIDENCE · READ ONLY</span><h2 id="reviewIdentity" style="font-size:18px;margin:10px 0 4px">—</h2><div class="small" id="reviewEvidenceId">—</div><div class="reviewEvidence" style="margin-top:12px"><div class="metric"><span class="small">STATE CHANNEL</span><b id="reviewStateEvidence">—</b></div><div class="metric"><span class="small">ACTUATOR</span><b id="reviewActEvidence">—</b></div><div class="metric"><span class="small">EVENTS</span><b id="reviewEventCount">—</b></div><div class="metric"><span class="small">GAPS</span><b id="reviewGapCount">—</b></div></div><div id="reviewGapNotice" class="notice hidden reviewGap"></div></div>
+        <div class="card"><h2 style="margin-top:0">Recorded actuator output</h2><div class="reviewActuator"><div class="metric"><span class="small">SRV1</span><b id="reviewSrv1">—</b></div><div class="metric"><span class="small">SRV2</span><b id="reviewSrv2">—</b></div><div class="metric"><span class="small">SRV3</span><b id="reviewSrv3">—</b></div><div class="metric"><span class="small">SRV4</span><b id="reviewSrv4">—</b></div><div class="metric"><span class="small">THR</span><b id="reviewThrottle">—</b></div></div><div class="reviewPlane" aria-label="Recorded control surface visualization"><div class="reviewPlaneBody"></div><div class="reviewWing"></div><div class="reviewTail"></div><div id="reviewAilL" class="reviewSurface reviewAilL"></div><div id="reviewAilR" class="reviewSurface reviewAilR"></div><div id="reviewTailL" class="reviewSurface reviewTailL"></div><div id="reviewTailR" class="reviewSurface reviewTailR"></div><div id="reviewProp" class="reviewProp"></div></div><div class="small" style="margin-top:8px">srv1 → ailerons · srv2/srv4 → V-tail · srv3 → propeller. Missing channels remain unavailable; joystick/input is never substituted.</div></div>
+        <div class="card"><button class="danger" id="reviewCloseBtn" onclick="reviewClose()">CLOSE REVIEW</button><div class="small" style="margin-top:8px">Closing Review only discards the historical cursor session. It does not change live Attempt state or authority.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main></div>
+<footer class="strip" id="runtimeStrip"><span>Attempt: <strong id="stripAttempt">None</strong></span><span>State: <strong id="stripState">—</strong></span><span>Worker: <strong id="stripWorker">—</strong></span><span>Mode: <strong>Engineering</strong></span></footer>
+</div>
+<script>
+let latest=null,busy=false,initialHydrated=false;function q(id){return document.getElementById(id)}function clearMsg(){q('msg').innerHTML=''}function message(text,bad=false){q('msg').innerHTML=`<div class="${bad?'error':'notice'}">${text}</div>`}function show(id){
+  ['dashboard','wizard','live','complete','review'].forEach(x=>q(x).classList.add('hidden'));
+  q(id).classList.remove('hidden');
+  const app=q('appRoot');
+  if(app)app.classList.toggle('summaryMode',id==='complete');
+  clearMsg();
+}function step(n){[1,2,3,4].forEach(i=>{q('w'+i).classList.toggle('hidden',i!==n);q('s'+i).className='step '+(i<n?'done':i===n?'active':'')})}function beginWizard(){show('wizard');step(1)}
+function openCurrentSession(auto=false){
+  const c=latest&&latest.current;
+  if(!c){
+    if(!auto)show('dashboard');
+    return;
+  }
+  const s=String(c.state||'').toLowerCase();
+  if(s==='setup'||s==='ready'){
+    show('wizard');
+    step(4);
+    renderStatus(latest);
+    return;
+  }
+  if(s==='active'||s==='paused'||s==='interrupted'){
+    show('live');
+    renderStatus(latest);
+    return;
+  }
+  if(s==='ended'){
+    renderEndedSummary(c);
+    show('complete');
+    renderStatus(latest);
+    return;
+  }
+  if(!auto)message('Current Attempt state cannot be opened yet: '+c.state,true);
+}
+function renderEndedSummary(c){
+  if(!c)return;
+  q('doneTitle').textContent=(c.student_name||c.student_id||'Student')+' · '+(c.scenario||'Exercise');
+  q('doneAttempt').textContent=(c.attempt_id||'').slice(0,8)||'—';
+}
+
+async function pauseSession(){
+  const b=q('pauseResumeBtn');
+  if(b){b.disabled=true;b.textContent='PAUSING…';}
+  try{
+    const j=await api('/api/session/pause');
+    latest=j;
+    renderStatus(j);
+  }catch(e){
+    message(e.message,true);
+  }finally{
+    if(latest)renderPauseUi(latest.current);
+  }
+}
+async function resumeSession(){
+  const b=q('pauseResumeBtn');
+  if(b){b.disabled=true;b.textContent='RESUMING…';}
+  try{
+    const j=await api('/api/session/resume');
+    latest=j;
+    renderStatus(j);
+  }catch(e){
+    message(e.message,true);
+  }finally{
+    if(latest)renderPauseUi(latest.current);
+  }
+}
+function renderPauseUi(c){
+  const b=q('pauseResumeBtn');
+  if(!b)return;
+  const s=String(c?.state||'').toLowerCase();
+  if(s==='active'){
+    b.disabled=false;
+    b.textContent='PAUSE';
+    b.className='secondary big';
+    b.onclick=pauseSession;
+  }else if(s==='paused'){
+    b.disabled=false;
+    b.textContent='RESUME';
+    b.className='primary big';
+    b.onclick=resumeSession;
+  }else{
+    b.disabled=true;
+    b.textContent=s==='interrupted'?'INTERRUPTED':'PAUSE';
+    b.className='secondary big';
+  }
+}
+
+
+function renderInterruptUi(c){
+  const box=q('interruptBanner'); if(!box)return;
+  const title=q('interruptTitle'), text=q('interruptText');
+  const s=String(c?.state||'').toLowerCase(), intr=c?.interrupt||null;
+  if(s==='interrupted'){
+    box.className='notice bad'; title.textContent='ATTEMPT INTERRUPTED';
+    const cc=intr?.continuity||{}, wait=[];
+    if(!cc.student_connected)wait.push('Student heartbeat');
+    if(!cc.control_connected)wait.push('Feather control');
+    if(!cc.authority_present)wait.push('Flight authority');
+    if(cc.process_identity_preserved===false)wait.push('process continuity');
+    text.textContent='Reason: '+(intr?.reason||'continuity_loss')+' · Flight is held · waiting for '+(wait.length?wait.join(', '):'continuity verification')+' · no auto-resume.';
+    box.classList.remove('hidden'); return;
+  }
+  if(s==='paused'&&intr?.recovery_verified){
+    box.className='notice warn'; title.textContent='CONTINUITY RESTORED — PAUSED';
+    text.textContent='Student/control continuity verified. Flight remains physically held. Instructor RESUME is required.';
+    box.classList.remove('hidden'); return;
+  }
+  box.classList.add('hidden');
+}
+
+
+async function r4aTakeover(){
+  try{
+    latest=await api('/api/authority/flight/takeover');
+    renderStatus(latest);
+  }catch(e){message(e.message,true);}
+}
+async function r4aHandback(){
+  try{
+    latest=await api('/api/authority/flight/handback');
+    renderStatus(latest);
+  }catch(e){message(e.message,true);}
+}
+async function r4aCancelHandback(){
+  try{
+    latest=await api('/api/authority/flight/cancel-handback');
+    renderStatus(latest);
+  }catch(e){message(e.message,true);}
+}
+function renderR4aAuthority(c){
+  const a=c?.flight_authority_transfer;
+  const s=q('r4aAuthorityStatus');
+  const take=q('r4aTakeoverBtn');
+  const back=q('r4aHandbackBtn');
+  const cancel=q('r4aCancelHandbackBtn');
+  if(!s||!take||!back||!cancel)return;
+  if(!a){
+    s.textContent='FLIGHT OWNER —';
+    take.disabled=back.disabled=cancel.disabled=true;
+    return;
+  }
+  const o=a.owner||{};
+  const pending=a.pending_handback;
+  s.textContent='FLIGHT OWNER '+String(o.kind||'unknown').toUpperCase()+
+    (Number.isInteger(o.epoch)?` • epoch ${o.epoch}`:'')+
+    (pending?` • HANDBACK ${Math.ceil(pending.expires_in_s)}s`:'');
+  take.disabled=!a.can_takeover;
+  back.disabled=!a.can_request_handback;
+  cancel.disabled=!a.can_cancel_handback;
+  take.style.display=o.kind==='student'?'':'none';
+  back.style.display=o.kind==='instructor'&&!pending?'':'none';
+  cancel.style.display=pending?'':'none';
+}
+
+async function api(path,body={}){const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();if(!r.ok||j.ok===false)throw new Error(j.error||'Request failed');latest=j;renderStatus(j);return j}
+function currentUiPage(){
+  for(const id of ['dashboard','wizard','live','complete','review']){
+    const el=q(id);
+    if(el&&!el.classList.contains('hidden'))return id;
+  }
+  return 'dashboard';
+}
+// DEV018_REV8_2C_ENDED_NAVIGATION_FIX
+async function refresh(){
+  try{
+    const r=await fetch('/api/status',{cache:'no-store'});
+    const j=await r.json();
+    latest=j;
+    renderStatus(j);
+
+    const c=j.current;
+    const s=String(c?.state||'').toLowerCase();
+
+    if(!initialHydrated){
+      initialHydrated=true;
+      openCurrentSession(true);
+      return;
+    }
+
+    if(s==='ended'){
+      renderEndedSummary(c);
+      const page=currentUiPage();
+      if(page==='live'){
+        show('complete');
+      }
+      return;
+    }
+  }catch(e){
+    message('Backend status unavailable: '+e.message,true);
+  }
+}
+function renderStatus(j){const c=j.current;renderR4aAuthority(c);renderPauseUi(c);renderInterruptUi(c);
+const currentCard=q('currentSessionCard');
+if(c){
+  currentCard.classList.remove('hidden');
+  q('currentSessionTitle').textContent=(c.student_name||c.student_id||'Student')+' · '+(c.scenario||'Exercise');
+  q('currentSessionAttempt').textContent='ATT '+String(c.attempt_id||'').slice(0,8);
+  q('currentSessionState').textContent=String(c.state||'UNKNOWN').toUpperCase();
+  q('currentSessionWorker').textContent=c.worker_started?'Worker started':'Worker stopped';
+  const cs=String(c.state||'').toLowerCase();
+  q('openCurrentSessionBtn').textContent=cs==='active'?'OPEN LIVE SESSION':(cs==='setup'||cs==='ready')?'CONTINUE READINESS':cs==='ended'?'OPEN SUMMARY':'OPEN SESSION';
+}else{
+  currentCard.classList.add('hidden');
+}q('dashAttempt').textContent=c?c.attempt_id.slice(0,8):'None';q('dashState').textContent=c?c.state:'—';q('dashWorker').textContent=c?(c.worker_started?'Started':'Stopped'):'—';q('stripAttempt').textContent=c?c.attempt_id.slice(0,8):'None';q('stripState').textContent=c?c.state:'—';q('stripWorker').textContent=c?(c.worker_started?'Started':'Stopped'):'—';if(j.limitations)q('limitations').innerHTML='<h2>DEV-018 rev6 limitations</h2><div class="card"><ul>'+j.limitations.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>';if(c){q('attemptBadge').textContent='ATT '+c.attempt_id.slice(0,8);q('readyState').textContent=c.state;q('coreStateCheck').textContent=c.state;q('runtimeReady').textContent=(c.state.toLowerCase()==='ready'||c.state.toLowerCase()==='active')?'✓ PASS':'○ NOT RUN';q('runtimeReady').className=(c.state.toLowerCase()==='ready'||c.state.toLowerCase()==='active')?'ok':'warn';const ss=c.student_station||{};
+q('studentReady').textContent=ss.ready?'✓ CONNECTED · READY':ss.connected?'○ CONNECTED · NOT READY':'○ NOT CONNECTED';
+q('studentReady').className=ss.ready?'ok':'warn';
+const ctl=c.control||{};
+const ctlReady=!!(ctl.available&&ctl.gateway_started&&ctl.client_connected&&ctl.mav_peer_ready&&ctl.authority);
+q('controlReady').textContent=ctlReady?'✓ FEATHER · MAV · AUTHORITY READY':ctl.available?(ctl.client_connected?'○ MAV/AUTHORITY WAITING':'○ FEATHER CLIENT WAITING'):'○ NOT PREPARED';
+q('controlReady').className=ctlReady?'ok':'warn';
+q('startBtn').disabled=!(c.state.toLowerCase()==='ready'&&ss.connected&&ss.ready&&ctlReady);
+q('liveControl').textContent=ctl.authority?(ctl.client_connected?'STUDENT · EPOCH '+ctl.authority.epoch:'RELEASED / CLIENT LOST'):'NOT ASSIGNED';
+q('liveControl').className=(ctl.authority&&ctl.client_connected)?'ok':'warn';
+const ju=c.student_join||{};
+q('studentJoinUrl').textContent=ju.revoked?'Attempt ended — student join token revoked':(ju.lan_url||ju.local_url||'Join link unavailable');
+q('copyJoinBtn').disabled=!!ju.revoked;if(['active','paused','interrupted'].includes(c.state.toLowerCase())){q('liveState').textContent=c.state.toLowerCase()==='active'?'● ACTIVE':c.state.toUpperCase();q('liveState').className='badge '+(c.state.toLowerCase()==='active'?'ok':c.state.toLowerCase()==='paused'?'warn':'bad');q('liveAttempt').textContent=c.attempt_id.slice(0,8);q('liveStudent').textContent=c.student_id;q('studentLabel').textContent=c.student_name+' / '+c.student_id;q('attemptState').textContent=c.state;const h=c.worker_health||{};q('workerHealth').textContent=h.healthy===false?'DEGRADED':'HEALTHY';q('workerHealth').className=h.healthy===false?'bad':'ok';const p=c.pose||{};q('lat').textContent=num(p.lat,6);q('lon').textContent=num(p.lon,6);q('alt').textContent=num(p.alt_msl,2)+' m';q('yaw').textContent=num(p.yaw,1)+'°';q('roll').textContent=num(p.roll,1)+'°';q('pitch').textContent=num(p.pitch,1)+'°';q('agl').textContent=num(p.agl,2)+' m';q('gs').textContent=num(p.groundspeed,1)+' m/s'}}}
+function num(v,n){return Number.isFinite(Number(v))?Number(v).toFixed(n):'—'}async function createSession(){if(busy)return;busy=true;q('createBtn').disabled=true;message('<span class="spinner"></span>Creating real Session / Exercise / Attempt…');try{const j=await api('/api/session/create',{student_id:q('studentId').value,student_name:q('studentName').value,scenario:'MAN-LDG-004-v1.0',level:q('level').value,training_mode:q('mode').value,role:q('role').value,aircraft_id:q('aircraft').value,environment:q('environment').value,runway:q('runway').value,wind_speed_kt:Number(q('windSpeed').value),wind_direction_deg:Number(q('windDir').value)});step(4);clearMsg()}catch(e){message(e.message,true)}finally{busy=false;q('createBtn').disabled=false}}
+async function copyStudentLink(){
+  const u=latest&&latest.current&&latest.current.student_join;
+  const link=(u&&u.lan_url)||(u&&u.local_url)||'';
+  if(!link){message('Student join link is not available yet.',true);return}
+  try{await navigator.clipboard.writeText(link);message('Student join link copied.')}catch(e){prompt('Copy this student join link:',link)}
+}
+async function prepareRuntime(){if(busy)return;busy=true;q('prepareBtn').disabled=true;message('<span class="spinner"></span>Starting direct OMNI worker and collecting trusted FG/MAV evidence. This can take a while on the local machine…');try{await api('/api/session/prepare',{timeout:60});clearMsg()}catch(e){message(e.message,true)}finally{busy=false;q('prepareBtn').disabled=false}}
+async function startSession(){if(busy)return;busy=true;q('startBtn').disabled=true;message('<span class="spinner"></span>Fresh revalidation for Ready → Active…');try{const j=await api('/api/session/start');show('live');renderStatus(j)}catch(e){message(e.message,true)}finally{busy=false}}
+async function endSession(){
+  if(!confirm('End this Attempt? It cannot return to Active.'))return;
+  try{
+    const j=await api('/api/session/end',{reason:'exercise_completed'});
+    renderEndedSummary(j.current);
+    show('complete');
+    renderStatus(j);
+  }catch(e){
+    message(e.message,true);
+  }
+}
+setInterval(()=>{q('clock').textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+' WIB'},1000);setInterval(()=>{if(!busy)refresh()},1000);refresh();
+</script>
+
+<script src="./review_renderer.js"></script>
+<script src="./review_ui.js"></script>
+</body></html>
